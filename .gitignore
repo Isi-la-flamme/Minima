@@ -6,6 +6,9 @@ __pycache__/
 # C extensions
 *.so
 
+minima_env/
+data/
+
 # Distribution / packaging
 .Python
 build/
