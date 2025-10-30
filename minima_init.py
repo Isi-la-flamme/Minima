@@ -1,6 +1,8 @@
 import os
+import subprocess
+import sys
 
-# Dossiers du projet
+# --- Dossiers du projet ---
 dirs = [
     "minima/core",
     "minima/plugins",
@@ -10,7 +12,7 @@ dirs = [
     "logs",
 ]
 
-# Fichiers du projet
+# --- Fichiers du projet ---
 files = [
     "README.md",
     "requirements.txt",
@@ -33,11 +35,11 @@ files = [
     "minima/plugins/nlp_plugin.py",
 ]
 
-# Création des dossiers
+# --- Création des dossiers ---
 for d in dirs:
     os.makedirs(d, exist_ok=True)
 
-# Création des fichiers vides ou de base
+# --- Création des fichiers ---
 for f in files:
     if not os.path.exists(f):
         with open(f, "w") as fp:
@@ -68,3 +70,16 @@ headers:
                 fp.write("")
 
 print("✅ Arborescence Minima v0.9 créée avec succès.")
+
+# --- Création du venv ---
+if not os.path.exists("venv"):
+    subprocess.run([sys.executable, "-m", "venv", "venv"])
+    print("✅ Environnement virtuel 'venv' créé.")
+
+# --- Commande d’activation ---
+if os.name == "posix":  # Termux / Linux / macOS
+    activate_cmd = "source venv/bin/activate"
+else:  # Windows
+    activate_cmd = "venv\\Scripts\\activate"
+
+print(f"➡️ Pour activer le venv, exécute : {activate_cmd}")
