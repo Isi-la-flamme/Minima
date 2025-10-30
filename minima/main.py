@@ -49,6 +49,7 @@ def main():
     urls = cfg.get("urls", [])
 
     logger.info(f"Initialisation de la file persistante: {QUEUE_PATH}")
+    os.makedirs(os.path.dirname(QUEUE_PATH), exist_ok=True)  # <-- ligne à ajouter
     queue = PersistentQueue(QUEUE_PATH)
     analyzer = GenericAnalyzer(logger=logger)
     results = []

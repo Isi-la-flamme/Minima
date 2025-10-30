@@ -8,6 +8,7 @@ __pycache__/
 
 minima_env/
 data/
+exports/
 
 # Distribution / packaging
 .Python

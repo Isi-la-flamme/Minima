@@ -13,9 +13,9 @@ Minima est un framework modulaire de scraping et d’analyse extensible par plug
 - Métriques globales (succès, échecs, latence, taille, RPS)
 
 ## Initialisation & Installation
-- Minima_init.py cree la place
-- python - m venv minima_env
-- \minim_env\Scripts\Activate.ps1 ou Windows & minima_env pour Mac et Linux
+- minima_init.py cree la place
+- python -m venv minima_env
+- minima_env\Scripts\Activate.ps1 ou Windows & source scripts/bin/activate pour Mac et Linux
 - pip install -r requirements.txt
 - python -m minima.main
 - 
