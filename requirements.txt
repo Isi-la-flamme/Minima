@@ -1,0 +1,7 @@
+colorama
+requests
+beautifulsoup4
+lxml
+PyYAML
+tqdm
+pandas
