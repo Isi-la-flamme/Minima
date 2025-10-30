@@ -1,26 +1,55 @@
-import queue
+# minima/core/queue.py
+import os
+import json
 from minima.core.logger import logger
 
-class TaskQueue:
-    def __init__(self):
-        self.q = queue.Queue()
+class PersistentQueue:
+    def __init__(self, path):
+        self.path = path
+        self.data = {"queue": [], "processed": []}
+        self._load()
+
+    def _load(self):
+        if os.path.exists(self.path):
+            try:
+                with open(self.path, "r", encoding="utf-8") as f:
+                    self.data = json.load(f)
+                logger.info(f"Queue chargée depuis {self.path} ({len(self.data['queue'])} en attente)")
+            except Exception as e:
+                logger.warning(f"Échec du chargement de la queue: {e}")
+        else:
+            logger.info(f"Aucune queue trouvée, création d'une nouvelle: {self.path}")
+            self._save()
+
+    def _save(self):
+        try:
+            with open(self.path, "w", encoding="utf-8") as f:
+                json.dump(self.data, f, indent=2)
+        except Exception as e:
+            logger.error(f"Erreur lors de la sauvegarde de la queue: {e}")
 
     def add(self, item):
-        self.q.put(item)
-        logger.info(f"Added to queue: {item}")
+        if item not in self.data["queue"] and item not in self.data["processed"]:
+            self.data["queue"].append(item)
+            logger.info(f"Added to queue: {item}")
+            self._save()
 
     def get(self):
-        if not self.q.empty():
-            return self.q.get()
-        return None
+        if self.is_empty():
+            return None
+        item = self.data["queue"].pop(0)
+        self._save()
+        return item
 
-    def clear(self):
-        with self.q.mutex:
-            self.q.queue.clear()
-        logger.info("Queue cleared")
-
-    def size(self):
-        return self.q.qsize()
+    def mark_processed(self, item):
+        self.data["processed"].append(item)
+        logger.info(f"Marqué comme traité: {item}")
+        self._save()
 
     def is_empty(self):
-        return self.q.empty()# queue.py
+        return len(self.data["queue"]) == 0
+
+    def clear(self):
+        self.data = {"queue": [], "processed": []}
+        self._save()
+        logger.info("Queue réinitialisée")
