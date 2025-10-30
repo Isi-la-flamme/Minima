@@ -1,0 +1,5 @@
+# Liste des plugins actifs dans le pipeline
+pipeline:
+  - analyzer_plugin
+  - nlp_plugin
+  - example_plugin
