@@ -1,39 +1,43 @@
+# minima/core/config_loader.py
+from pathlib import Path
 import yaml
 import os
-from watchdog.observers import Observer
-from watchdog.events import FileSystemEventHandler
 from minima.core.logger import logger
+from minima.core.errors import ConfigError
 
-CONFIG_PATH = os.path.join(os.path.dirname(__file__), "..", "config", "config.yaml")
+DEFAULT_CONFIG_PATH = Path(__file__).resolve().parents[2] / "config" / "config.yaml"
 _config = {}
 
-def load_config():
+
+def load_config(path: Path = None):
+    """Charge la configuration YAML principale."""
     global _config
+    config_path = Path(path) if path else DEFAULT_CONFIG_PATH
+
     try:
-        with open(CONFIG_PATH, "r", encoding="utf-8") as f:
+        with open(config_path, "r", encoding="utf-8") as f:
             _config = yaml.safe_load(f) or {}
-            logger.info(f"Configuration loaded from {CONFIG_PATH}")
+            logger.info(f"Configuration chargée depuis {config_path}")
     except FileNotFoundError:
-        logger.warning(f"Config file not found: {CONFIG_PATH}")
+        logger.warning(f"Fichier de configuration introuvable: {config_path}")
         _config = {}
+    except yaml.YAMLError as e:
+        raise ConfigError(f"Erreur YAML dans {config_path}: {e}")
     return _config
 
+
 def get(key, default=None):
+    """Récupère une clé de configuration."""
     return _config.get(key, default)
 
-class ConfigWatcher(FileSystemEventHandler):
-    def __init__(self, path):
-        self.path = path
 
-    def on_modified(self, event):
-        if event.src_path.endswith("config.yaml"):
-            logger.info("Config file modified. Reloading...")
-            load_config()
-
-def start_config_watcher():
-    event_handler = ConfigWatcher(CONFIG_PATH)
-    observer = Observer()
-    observer.schedule(event_handler, os.path.dirname(CONFIG_PATH), recursive=False)
-    observer.start()
-    logger.info(f"ConfigWatcher started on {CONFIG_PATH}")
-    return observer# config_loader.py
+def ensure_paths():
+    """Vérifie et crée les dossiers essentiels si manquants."""
+    required_dirs = ["data", "logs", "exports"]
+    for d in required_dirs:
+        path = Path(d)
+        if not path.exists():
+            path.mkdir(parents=True, exist_ok=True)
+            logger.info(f"Répertoire créé: {path}")
+        else:
+            logger.debug(f"Répertoire présent: {path}")

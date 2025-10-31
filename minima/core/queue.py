@@ -6,7 +6,7 @@ from minima.core.logger import logger
 class PersistentQueue:
     def __init__(self, path):
         self.path = path
-        self.data = {"queue": [], "processed": []}
+        self.data = {"pending": [], "processed": []}
         self._load()
 
     def _load(self):
@@ -14,7 +14,19 @@ class PersistentQueue:
             try:
                 with open(self.path, "r", encoding="utf-8") as f:
                     self.data = json.load(f)
-                logger.info(f"Queue chargée depuis {self.path} ({len(self.data['queue'])} en attente)")
+
+                # Correction automatique ancienne structure
+                if "queue" in self.data:
+                    self.data["pending"] = self.data.pop("queue")
+                    self._save()
+
+                if "processed" not in self.data:
+                    self.data["processed"] = []
+
+                logger.info(
+                    f"Queue chargée depuis {self.path} "
+                    f"({len(self.data['pending'])} en attente)"
+                )
             except Exception as e:
                 logger.warning(f"Échec du chargement de la queue: {e}")
         else:
@@ -29,27 +41,32 @@ class PersistentQueue:
             logger.error(f"Erreur lors de la sauvegarde de la queue: {e}")
 
     def add(self, item):
-        if item not in self.data["queue"] and item not in self.data["processed"]:
-            self.data["queue"].append(item)
+        if item not in self.data["pending"] and item not in self.data["processed"]:
+            self.data["pending"].append(item)
             logger.info(f"Added to queue: {item}")
             self._save()
 
     def get(self):
         if self.is_empty():
             return None
-        item = self.data["queue"].pop(0)
+        item = self.data["pending"].pop(0)
         self._save()
         return item
 
     def mark_processed(self, item):
-        self.data["processed"].append(item)
-        logger.info(f"Marqué comme traité: {item}")
-        self._save()
+        if item not in self.data["processed"]:
+            self.data["processed"].append(item)
+            logger.info(f"Marqué comme traité: {item}")
+            self._save()
 
     def is_empty(self):
-        return len(self.data["queue"]) == 0
+        return len(self.data["pending"]) == 0
 
     def clear(self):
-        self.data = {"queue": [], "processed": []}
+        self.data = {"pending": [], "processed": []}
         self._save()
         logger.info("Queue réinitialisée")
+
+    def remaining_urls(self) -> list[str]:
+        """Retourne toutes les URLs encore à traiter."""
+        return list(self.data.get("pending", []))

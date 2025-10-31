@@ -32,3 +32,5 @@ def setup_logger():
     return root_logger
 
 logger = setup_logger()# logger.py
+def get_logger(name=None):
+    return logging.getLogger("minima" if name is None else name)

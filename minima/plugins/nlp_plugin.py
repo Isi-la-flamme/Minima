@@ -12,3 +12,7 @@ class NLPPlugin(BasePlugin):
 
         self.logger.info(f"[PLUGIN:{self.name}] {url} -> {metadata['word_count']} words")
         return metadata# nlp_plugin.py
+
+
+def process(url, html):
+    return {"plugin_result": f"{__name__} a traité {url}"}

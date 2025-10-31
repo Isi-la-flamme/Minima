@@ -11,3 +11,6 @@ class ExamplePlugin(BasePlugin):
 
         self.logger.info(f"[PLUGIN:{self.name}] Title: {title}")
         return metadata# example_plugin.py
+
+def process(url, html):
+    return {"plugin_result": f"{__name__} a traité {url}"}

@@ -5,3 +5,6 @@ lxml
 PyYAML
 tqdm
 pandas
+watchdog
+pydantic
+typer
