@@ -10,3 +10,7 @@ def test_logger_output(caplog):
     with caplog.at_level(logging.INFO):
         logger.info("message de test")
     assert any("message de test" in rec.message for rec in caplog.records)
+
+
+def get_logger(name=None):
+    return logging.getLogger("minima" if name is None else name)
