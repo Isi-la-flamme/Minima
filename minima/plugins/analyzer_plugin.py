@@ -14,3 +14,6 @@ class AnalyzerPlugin(BasePlugin):
 
         self.logger.info(f"[PLUGIN:{self.name}] Analyzed {url} -> links={links}, imgs={imgs}, size={page_size}")
         return metadata# analyzer_plugin.py
+
+def process(url, html):
+    return {"plugin_result": f"{__name__} a traité {url}"}
