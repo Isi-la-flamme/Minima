@@ -5,3 +5,9 @@ lxml
 PyYAML
 tqdm
 pandas
+watchdog
+pytest
+flake8
+pytest-mock
+coverage
+pytest-cov

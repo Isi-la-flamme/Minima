@@ -14,6 +14,11 @@ class PersistentQueue:
             try:
                 with open(self.path, "r", encoding="utf-8") as f:
                     self.data = json.load(f)
+                # Vérification de structure
+                if "queue" not in self.data:
+                    self.data["queue"] = []
+                if "processed" not in self.data:
+                    self.data["processed"] = []
                 logger.info(f"Queue chargée depuis {self.path} ({len(self.data['queue'])} en attente)")
             except Exception as e:
                 logger.warning(f"Échec du chargement de la queue: {e}")
